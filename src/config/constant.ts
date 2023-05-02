@@ -6,8 +6,8 @@ constants = {
   APP_LANGUAGE: ['en'],
 
   STATUS_CODE: {
-    SUCCESS: 1,
-    FAIL: 0,
+    SUCCESS: true,
+    FAIL: false,
   },
 
   WEB_STATUS_CODE: {

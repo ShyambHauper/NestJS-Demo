@@ -34,9 +34,12 @@ export class EmployeeService {
     })
       .sort({ createdAt: -1 })
       .lean();
+
+
+
     employeeData = employeeData.slice((skip - 1) * limit, skip * limit);
 
-    return employeeData
+    return { employeeData: employeeData, count: employeeData.length };
   }
 
 

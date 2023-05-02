@@ -1,8 +1,8 @@
 import { EmployeeService } from './employee.service';
-import { Controller, Get, Post, Delete, Param,Patch, Req, Res } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Patch, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { constants } from 'src/config/constant';
-import { sendResponse } from 'src/services/common.services';
+import { sendErrorResponse, sendResponse } from 'src/services/common.services';
 
 @Controller('/api/v1/employee')
 export class EmployeeController {
@@ -21,14 +21,12 @@ export class EmployeeController {
         result,
         req.headers.lang,
       );
-    } catch (error) {
-      const validationErrors = error.errors;
-      const errorMessage = Object.keys(validationErrors).map((key) => validationErrors[key].message).join(', '); // create a comma-separated error message from the validation errors
-      return sendResponse(
+    } catch (err) {
+      return sendErrorResponse(
         res,
         constants.WEB_STATUS_CODE.OK,
         constants.STATUS_CODE.FAIL,
-        errorMessage,
+        err,
         '',
         req.headers.lang,
       );
@@ -53,7 +51,7 @@ export class EmployeeController {
   @Patch('/update/:id')
   async update(@Res() res: Response, @Req() req: Request, @Param('id') id: string): Promise<any> {
     try {
-      
+
       const result = await this.employeeService.update(id, req);
 
       return sendResponse(
@@ -65,23 +63,12 @@ export class EmployeeController {
         req.headers.lang,
       );
 
-    } catch (error) {
-      const validationErrors = error.errors;
-      const firstErrorPath = Object.keys(validationErrors)[0];
-      const findIndex = firstErrorPath.split('.')[1]
-      let errorMessage : any
-  
-      if(/\d/.test(findIndex)){
-        errorMessage = Object.keys(validationErrors).map((key) => validationErrors[key].message).join(',') + `at index ${findIndex}`;
-      }else{
-         errorMessage = Object.keys(validationErrors).map((key) => validationErrors[key].message).join(','); // create a comma-separated error message from the validation errors
-      }
-      
-      return sendResponse(
+    } catch (err) {
+      return sendErrorResponse(
         res,
         constants.WEB_STATUS_CODE.OK,
         constants.STATUS_CODE.FAIL,
-        errorMessage,
+        err,
         '',
         req.headers.lang,
       );

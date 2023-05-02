@@ -50,6 +50,64 @@ export const sendResponse = (
   }
 };
 
+
+export const sendErrorResponse = (
+  res: any,
+  statusCode: any,
+  status: any,
+  err: any,
+  data: any,
+  lang: any = 'en',
+  replaceObj: any = {},
+) => {
+  try {
+    statusCode = +statusCode;
+    const formattedError = {};
+    let error: any
+
+    if (err.code === 11000) {
+       error = err
+       const key = Object.keys(error.keyValue)[0];
+       formattedError[key.split('.')[1]] = `Duplicate found ${key.split('.')[1]}` 
+    } else {
+       error = err.errors;
+       Object.keys(error).map((key) => {
+         let updatedStr: any
+         const path = error[key].properties.path;
+         const kind = error[key].properties.message;
+   
+         if (kind.startsWith('Path')) {
+           kind.split(' ')[0];
+           const newString = kind.replace('Path ', '');
+           const modifiedMessage = newString.replace(/`/g, '');
+           updatedStr = modifiedMessage;
+         } else {
+           updatedStr = kind
+         }
+         if (/[0-9]/.test(key.split('.')[1])) {
+           formattedError[path] = `${updatedStr} at index ${key.split('.')[1]}`
+         } else {
+           formattedError[path] = `${updatedStr}`;
+         }
+       });
+    }
+    res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+    res.write(
+      JSON.stringify({
+        status: status,
+        message: 'Validation error',
+        error: formattedError,
+        data: statusCode === 500 ? data.message : data,
+      }),
+    );
+    res.end();
+  } catch (err) {
+    console.log('Error(sendResponse): ', err);
+    throw err;
+  }
+};
+
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/ban-types
 function replaceString(_resMessage: any, replaceObj: {}): any {
   throw new Error('Function not implemented.');

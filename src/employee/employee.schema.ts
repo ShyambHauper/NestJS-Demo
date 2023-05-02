@@ -8,9 +8,9 @@ export class Employee extends Document {
 
   @Prop({
     type: {
-      firstName: { type: String, required: true },
-      lastName: { type: String, required: true },
-      email: { type: String, required: true },
+      firstName: { type: String, required: true , unique:true, minlength: 3 },
+      lastName: { type: String, required: true ,  minlength: 3 },
+      email: { type: String, required: true , unique:true },
       phone: {
         type: String, required: true, validate: {
           validator: (value) => {
